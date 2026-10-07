@@ -1,0 +1,5 @@
+node_modules/
+*.tgz
+*.tgz.sha256
+.DS_Store
+.e2e-*/

@@ -1,0 +1,110 @@
+{
+  "name": "dsh-reverie",
+  "description": "Reverie：输入（链接自动转录/抓取，支持音视频、网页、小红书、公众号、推特；中英对照精读）· 输出（flomo 式日记笔记）· 回顾（今日/本周/主题/待读），全程可 AI 解读与对话",
+  "version": "0.6.0",
+  "private": true,
+  "license": "GPL-3.0-only",
+  "author": "Ag (https://github.com/Gniy7Ga)",
+  "homepage": "https://github.com/Gniy7Ga/dsh-reverie#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gniy7Ga/dsh-reverie.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Gniy7Ga/dsh-reverie/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh-plugin",
+    "dsh",
+    "reverie",
+    "transcribe",
+    "whisper",
+    "reading",
+    "notes",
+    "flomo",
+    "review"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node tests/signatures.mjs && node tests/social.mjs && node tests/migrate.mjs && node tests/unit.mjs",
+    "check": "npm run build && npm test"
+  },
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "NOTICE.md",
+    "THIRD_PARTY_LICENSES.md",
+    "licenses",
+    "cordis.patch.yml",
+    "lib"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "meta": {
+      "title": "Reverie",
+      "description": "输入：扔链接（音视频 / 网页 / 小红书 / 公众号 / 推特）自动转录/抓取 → 中英对照精读；输出：随手记与日记；回顾：今日、本周、主题、待读"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-api-remotes",
+        "@deepseek-ai/dsh-api-gateway",
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-primitives"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-agent-default-model": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-home-paths": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-typert-protocol": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-tools": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-llm": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-agent-default-model": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-home-paths": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "esbuild": "^0.28.1",
+    "linkedom": "^0.18.13"
+  }
+}

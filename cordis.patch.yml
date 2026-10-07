@@ -1,0 +1,4 @@
+# reverie · 宿主插件行（bundle patch，由 dsh.profile.bundles 自动应用）
+- insert:
+    - id: reverie
+      name: 'dsh-reverie'
