@@ -14,7 +14,7 @@
 import { sanitizeHtml } from '../../shared/sanitize.js';
 import { textToHtml } from '../../shared/text.js';
 import { childrenOf, findAll, attrOf, parseXml, textOf } from '../../shared/xml.js';
-import { fetchJson, fetchText, nextData, sleep } from '../net.js';
+import { fetchJson, fetchResponse, fetchText, nextData, sleep } from '../net.js';
 
 /** `open.spotify.com/(intl-xx/)episode/<id>` → id. */
 export function spotifyEpisodeId(url) {
@@ -34,7 +34,7 @@ export function classifySpotify(url, host) {
 
 function networkHint(error) {
   const code = error?.cause?.code ?? error?.code ?? '';
-  return `连不上 Spotify（open.spotify.com${code ? `，${code}` : ''}）。如果你在中国大陆，可能需要开代理；也可以换成同一期在小宇宙 / Apple Podcasts / YouTube 的链接。`;
+  return `连不上 Spotify（open.spotify.com${code ? `，${code}` : ''}，IPv6 和 IPv4 都试过了）。请检查网络或代理；也可以换成同一期在小宇宙 / Apple Podcasts / YouTube 的链接。`;
 }
 
 async function withRetry(task, attempts = 3) {
@@ -51,12 +51,11 @@ async function withRetry(task, attempts = 3) {
 
 /** Short links (spotify.link) redirect to open.spotify.com; follow them to get the episode id. */
 async function resolveShortLink(url, signal) {
-  const response = await fetch(url, { redirect: 'follow', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(15_000)]) : AbortSignal.timeout(15_000) });
+  const response = await fetchResponse(url, { signal, timeoutMs: 15_000, headers: { accept: 'text/html' } });
   const final = new URL(response.url);
   const id = final.hostname === 'open.spotify.com' ? spotifyEpisodeId(final) : undefined;
   if (id) return id;
-  const html = await response.text();
-  return /open\.spotify\.com\/episode\/([0-9A-Za-z]{22})/.exec(html)?.[1];
+  return /open\.spotify\.com\/episode\/([0-9A-Za-z]{22})/.exec(response.buffer.toString('utf8'))?.[1];
 }
 
 /** Episode metadata from the embed page (more reliable than the full web player page). */

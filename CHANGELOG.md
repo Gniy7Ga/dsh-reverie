@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2 — 2026-10-08
+
+- 修复：有些网络的 IPv6 线路会重置到 Spotify 等网站的连接（浏览器会自动改走 IPv4，所以浏览器能打开）。现在连接失败时会自动改用 IPv4 再试一次，网页抓取、小红书和 Spotify 都适用。
+
 ## 0.6.1 — 2026-10-08
 
 - 支持 Spotify 播客单集链接（`open.spotify.com/episode/…`、`spotify.link` 短链）。Spotify 的音频是加密的，Reverie 会读取节目信息，到 Apple Podcasts 公开目录和节目 RSS 里找到同一期的公开音频再转录；Spotify 独家节目会提示换其他平台的链接。

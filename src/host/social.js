@@ -8,7 +8,7 @@
  * `video` ({ url, duration }) is set for video posts so the caller can transcribe them.
  */
 import { parseHTML } from 'linkedom';
-import { fetchJson, fetchText, BROWSER_UA } from './net.js';
+import { fetchJson, fetchResponse, fetchText, BROWSER_UA } from './net.js';
 import { htmlToBlocks } from './web.js';
 
 export const SOCIAL_PLATFORMS = ['xiaohongshu', 'wechat', 'twitter'];
@@ -250,8 +250,8 @@ export function xhsToPage(html, noteId) {
 }
 
 async function extractXhs(url, signal) {
-  const response = await fetch(url, { redirect: 'follow', signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(30_000)]) : AbortSignal.timeout(30_000), headers: { 'user-agent': BROWSER_UA, 'accept-language': 'zh-CN,zh;q=0.9', accept: 'text/html,application/xhtml+xml' } });
-  const html = await response.text();
+  const response = await fetchResponse(url, { signal, timeoutMs: 30_000, headers: { 'accept-language': 'zh-CN,zh;q=0.9', accept: 'text/html,application/xhtml+xml' } });
+  const html = response.buffer.toString('utf8');
   const finalUrl = new URL(response.url || url);
   if (/\/(404|login)/.test(finalUrl.pathname)) {
     const reason = finalUrl.searchParams.get('error_msg');

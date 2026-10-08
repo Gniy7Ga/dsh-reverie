@@ -1,7 +1,7 @@
 {
   "name": "dsh-reverie",
   "description": "Reverie：输入（链接自动转录/抓取，支持音视频、网页、小红书、公众号、推特；中英对照精读）· 输出（flomo 式日记笔记）· 回顾（今日/本周/主题/待读），全程可 AI 解读与对话",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "private": true,
   "license": "GPL-3.0-only",
   "author": "Ag (https://github.com/Gniy7Ga)",
