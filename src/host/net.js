@@ -21,7 +21,7 @@ function shortUrl(url) {
   try { const parsed = new URL(url); return `${parsed.host}${parsed.pathname}`.slice(0, 120); } catch { return String(url).slice(0, 120); }
 }
 
-export async function fetchText(url, { timeoutMs = 20_000, headers = {}, method = 'GET', body, signal } = {}) {
+export async function fetchText(url, { timeoutMs = 20_000, headers = {}, method = 'GET', body, signal, maxBytes = MAX_BYTES } = {}) {
   const timeout = AbortSignal.timeout(timeoutMs);
   const response = await fetch(url, {
     method,
@@ -29,14 +29,25 @@ export async function fetchText(url, { timeoutMs = 20_000, headers = {}, method 
     redirect: 'follow',
     headers: { 'user-agent': BROWSER_UA, 'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8', ...headers },
     signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
-  });
+  }).catch((error) => { throw networkError(error, url, signal, timeout); });
   const buffer = await response.arrayBuffer();
-  if (buffer.byteLength > MAX_BYTES) throw new Error(`响应超过 8 MB：${shortUrl(url)}`);
+  if (buffer.byteLength > maxBytes) throw new Error(`响应超过 ${Math.round(maxBytes / 1048576)} MB：${shortUrl(url)}`);
   const charset = /charset=([\w-]+)/i.exec(response.headers.get('content-type') ?? '')?.[1];
   let text;
   try { text = new TextDecoder(charset ?? 'utf-8', { fatal: false }).decode(buffer); } catch { text = new TextDecoder('utf-8').decode(buffer); }
   if (!response.ok) throw new HttpError(response.status, url, text.slice(0, 2000));
   return text;
+}
+
+/** Node's bare `fetch failed` says nothing; name the host and the low-level cause instead. */
+function networkError(error, url, signal, timeout) {
+  if (signal?.aborted) return error;
+  let host = String(url);
+  try { host = new URL(url).host; } catch { /* keep raw */ }
+  if (timeout.aborted) return Object.assign(new Error(`连接 ${host} 超时`), { cause: error, code: 'ETIMEDOUT' });
+  const code = error?.cause?.code ?? error?.code;
+  const reason = code === 'ENOTFOUND' ? '找不到这个域名' : code === 'ECONNRESET' ? '连接被重置' : code === 'ECONNREFUSED' ? '连接被拒绝' : /ETIMEDOUT|UND_ERR_CONNECT_TIMEOUT/.test(code ?? '') ? '连接超时' : (code ?? error?.message ?? '网络错误');
+  return Object.assign(new Error(`连不上 ${host}（${reason}）`), { cause: error, code });
 }
 
 export async function fetchJson(url, options = {}) {

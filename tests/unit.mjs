@@ -70,6 +70,15 @@ assert.equal((await svc.listItems({ unread: true })).items.length, 0);
 await svc.markItemRead({ id: item.id, read: false });
 assert.equal((await svc.listItems({ unread: true })).items.length, 1);
 
+// A Spotify link saved as a failed web page before Spotify was supported is re-detected on retry.
+svc.store.addItem({ id: 'it_sp', kind: 'web', platform: 'web', url: 'https://open.spotify.com/episode/0ePd4PUqCpN78hCjVRH0fr', title: 'x', createdAt: Date.now(), status: 'error', error: 'fetch failed', progress: 0 });
+await svc.retryItem({ id: 'it_sp' });
+const retried = svc.store.item('it_sp');
+assert.equal(retried.kind, 'media');
+assert.equal(retried.platform, 'spotify');
+assert.equal(retried.link.episodeId, '0ePd4PUqCpN78hCjVRH0fr');
+await svc.deleteItem({ id: 'it_sp' }); // aborts the job before it touches the network for long
+
 // Invalid links are rejected up front (no network involved).
 await assert.rejects(svc.submit({ text: '' }));
 await assert.rejects(svc.ingest('not a url'));

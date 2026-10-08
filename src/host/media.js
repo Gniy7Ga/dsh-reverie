@@ -1,7 +1,7 @@
 /*! SPDX-License-Identifier: GPL-3.0-only | Reverie (dsh-reverie) — Copyright (C) 2026 Ag (https://github.com/Gniy7Ga) */
 /**
  * Audio / video links → transcript paragraphs.
- *   1. resolve metadata (yt-dlp -J, or the 小宇宙 episode page)
+ *   1. resolve metadata (yt-dlp -J, the 小宇宙 episode page, or Spotify → public RSS audio)
  *   2. YouTube human-made captions are used directly when present
  *   3. otherwise download audio (yt-dlp / ffmpeg) and run the local Whisper worker
  */
@@ -15,6 +15,7 @@ import { toolchainEnv } from './toolchain.js';
 import { cuesToParagraphs } from './transcript.js';
 import { fetchVideoTranscript, videoIdOf } from './sources/youtube.js';
 import { classifySocial } from './social.js';
+import { classifySpotify, spotifyEpisode } from './sources/spotify.js';
 
 const MEDIA_EXT = /\.(mp3|m4a|aac|wav|flac|ogg|opus|mp4|m4v|mov|webm|mkv)(?:$|\?)/i;
 const VIDEO_HOSTS = /(^|\.)(vimeo\.com|tiktok\.com|douyin\.com|ixigua\.com|twitch\.tv|dailymotion\.com|ted\.com|soundcloud\.com|music\.163\.com|ximalaya\.com)$/i;
@@ -36,6 +37,8 @@ export function classifyLink(raw) {
     if (eid) return { type: 'media', platform: 'xiaoyuzhou', eid, url: `https://www.xiaoyuzhoufm.com/episode/${eid}` };
     return { type: 'error', message: '这是小宇宙节目主页，请粘贴某一期（单集）的链接' };
   }
+  const spotify = classifySpotify(url, host);
+  if (spotify) return spotify;
   const social = classifySocial(url);
   if (social) return social;
   if (host === 'podcasts.apple.com' && url.searchParams.get('i')) return { type: 'media', platform: 'apple', url: url.href };
@@ -112,6 +115,7 @@ async function xiaoyuzhouEpisode(url) {
 /** Resolve metadata for any media link. */
 export async function resolveMedia(chain, link, signal) {
   if (link.platform === 'xiaoyuzhou') return { ...await xiaoyuzhouEpisode(link.url), playback: { kind: 'audio' } };
+  if (link.platform === 'spotify') return { ...await spotifyEpisode(link, signal), playback: { kind: 'audio' } };
   if (link.platform === 'file') {
     const name = decodeURIComponent(new URL(link.url).pathname.split('/').pop() || '音频');
     const video = /\.(mp4|m4v|mov|webm|mkv)(?:$|\?)/i.test(link.url);

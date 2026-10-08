@@ -390,6 +390,9 @@ export class ReaderService extends TypertRemoteService {
     const item = this.store.item(request?.id);
     if (!item) throw new Error('找不到这条内容');
     if (ACTIVE.has(item.status) && this.controllers.has(item.id)) return { ok: true };
+    // A link saved before its platform was supported (e.g. Spotify, once treated as a web page) is re-detected.
+    const link = classifyLink(item.url);
+    if (link.type === 'media' && item.kind !== 'media') Object.assign(item, { kind: 'media', platform: link.platform, link, url: link.url });
     item.status = 'queued'; item.error = undefined; item.progress = 0;
     this.store.touch();
     this.enqueue(item);

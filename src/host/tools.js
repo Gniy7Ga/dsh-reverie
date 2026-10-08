@@ -16,7 +16,7 @@ export function createToolDefinitions(service) {
   return [
     defineTool({
       name: 'reader_ingest',
-      description: 'Send a link to the "Reverie" reader: audio/video links (YouTube, Bilibili, 小宇宙, Apple Podcasts, media files) are transcribed locally with Whisper and translated (Chinese/English); X/Twitter posts, WeChat 公众号 articles, 小红书 notes and other web pages are extracted to clean text (video posts are transcribed too) and translated. Returns the item id; processing continues in the background unless wait=true.',
+      description: 'Send a link to the "Reverie" reader: audio/video links (YouTube, Bilibili, 小宇宙, Spotify and Apple Podcasts episodes, media files) are transcribed locally with Whisper and translated (Chinese/English); X/Twitter posts, WeChat 公众号 articles, 小红书 notes and other web pages are extracted to clean text (video posts are transcribed too) and translated. Returns the item id; processing continues in the background unless wait=true.',
       parameters: {
         url: { type: 'string', description: 'The link.', required: true },
         wait: { type: 'boolean', description: 'Wait until transcription/extraction (not translation) finishes. Long media can take minutes.' },

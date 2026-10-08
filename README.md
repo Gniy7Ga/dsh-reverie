@@ -15,7 +15,8 @@
 左栏分三块：
 
 - **输入**：粘贴链接就行。
-  - YouTube、B 站、小宇宙单集、苹果播客单集、音视频直链：在本机转录。YouTube 有人工字幕时直接用字幕；没有就用 yt-dlp 下载音频，再用本机 Whisper 转录（Apple 芯片用 mlx-whisper，否则用 faster-whisper）。
+  - YouTube、B 站、小宇宙单集、Spotify 和苹果播客单集、音视频直链：在本机转录。YouTube 有人工字幕时直接用字幕；没有就用 yt-dlp 下载音频，再用本机 Whisper 转录（Apple 芯片用 mlx-whisper，否则用 faster-whisper）。
+  - Spotify 的音频是加密的，不能直接下载。Reverie 会读取这期节目的标题和节目名，到 Apple Podcasts 公开目录和节目的 RSS 里找到同一期的公开音频再转录；Spotify 独家节目没有公开音频，会提示换成其他平台的链接。
   - 网页：抓取正文。
   - 小红书笔记、公众号文章、推特推文：抓取正文和图片（推文走 vxtwitter，失败时退回官方 syndication 接口；小红书需要 App「分享 → 复制链接」得到的新链接）。带视频的帖子会再把音轨转录出来。
   - 列表可以按「全部 / 音视频 / 网页 / 小红书 / 公众号 / 推特」筛选。

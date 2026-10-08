@@ -8,7 +8,7 @@ import { VideoPlayer } from './VideoPlayer.jsx';
 import { useStable } from './ui.jsx';
 
 const STATUS = { queued: '排队中', resolving: '解析中', downloading: '下载音频', transcribing: '转录中', translating: '翻译中', done: '完成', error: '失败' };
-const PLATFORM = { youtube: 'YouTube', bilibili: 'B 站', xiaoyuzhou: '小宇宙', apple: '播客', file: '音视频', other: '视频', web: '网页', xiaohongshu: '小红书', wechat: '公众号', twitter: '推特' };
+const PLATFORM = { youtube: 'YouTube', bilibili: 'B 站', xiaoyuzhou: '小宇宙', spotify: 'Spotify', apple: '播客', file: '音视频', other: '视频', web: '网页', xiaohongshu: '小红书', wechat: '公众号', twitter: '推特' };
 const FILTERS = [['all', '全部'], ['media', '音视频'], ['web', '网页'], ['xiaohongshu', '小红书'], ['wechat', '公众号'], ['twitter', '推特']];
 const SOCIAL = new Set(['xiaohongshu', 'wechat', 'twitter']);
 const MODES = { bilingual: '中英对照', translation: '中文', original: '原文' };
@@ -54,7 +54,7 @@ export function InputSide({ api, selected, onSelect, nav, version, onCounts }) {
   return <>
     <div className="mr-drop">
       <Icon name="link" size={16} />
-      <input value={link} placeholder="粘贴 YouTube / B站 / 小宇宙 / 小红书 / 公众号 / 推特 / 网页链接" onChange={(event) => setLink(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') void submit(); }} disabled={busy} />
+      <input value={link} placeholder="粘贴 YouTube / B站 / 小宇宙 / Spotify / 小红书 / 公众号 / 推特 / 网页链接" onChange={(event) => setLink(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') void submit(); }} disabled={busy} />
       <button type="button" className={`mr-drop-go${valid ? ' is-ready' : ''}`} disabled={!valid || busy} onClick={() => void submit()}>{busy ? <span className="mr-spinner" /> : '收进来'}</button>
     </div>
     <div className="mr-pills">
@@ -164,7 +164,7 @@ export function InputCenter({ api, selection, nav, aiOpen, onSubject, onSelectId
     if (next) onSelectId(next);
   };
 
-  if (!itemId) return <div className="mr-empty-center"><Icon name="link" size={30} strokeWidth={1.4} /><h3>把链接扔进来</h3><p>YouTube、B 站、小宇宙单集、苹果播客单集、音视频直链会在本机转录，外文自动翻成中英对照；网页、小红书笔记、公众号文章、推文会自动抓取正文和图片，带视频的帖子也会转录。</p></div>;
+  if (!itemId) return <div className="mr-empty-center"><Icon name="link" size={30} strokeWidth={1.4} /><h3>把链接扔进来</h3><p>YouTube、B 站、小宇宙单集、Spotify 和苹果播客单集、音视频直链会在本机转录，外文自动翻成中英对照；网页、小红书笔记、公众号文章、推文会自动抓取正文和图片，带视频的帖子也会转录。</p></div>;
   if (error) return <div className="mr-empty-center mr-error-text">{error}</div>;
   if (!data) return <div className="mr-skeleton"><div /><div /><div /></div>;
   const { item, blocks, translation } = data;
